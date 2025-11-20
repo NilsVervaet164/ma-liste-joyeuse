@@ -46,7 +46,10 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
   };
 
   return (
-    <div className={`card-soft p-4 space-y-3 ${task.completed ? 'opacity-60' : ''}`}>
+    <div 
+      className={`card-soft p-4 space-y-3 ${task.completed ? 'opacity-60' : ''}`}
+      style={projet ? { borderLeft: `4px solid ${projet.couleur}` } : undefined}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-3 flex-1">
           <Checkbox
@@ -113,7 +116,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
       <div className="flex flex-wrap gap-2">
         {task.taille && (
           <Badge className={getTailleBadgeColor(task.taille)}>
-            Taille: {task.taille}
+            {task.taille}
           </Badge>
         )}
         {type && (
