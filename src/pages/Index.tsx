@@ -1,11 +1,74 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ListTodo, FolderKanban, Tag, BarChart3 } from "lucide-react";
+import TasksTab from "@/components/tasks/TasksTab";
+import ProjetsTab from "@/components/projets/ProjetsTab";
+import TypesTab from "@/components/types/TypesTab";
+import StatsTab from "@/components/stats/StatsTab";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("tasks");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
+            Mes Tâches
+          </h1>
+          <p className="text-muted-foreground">
+            Organisez votre travail avec style ✨
+          </p>
+        </header>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-card shadow-[0_2px_8px_-1px_hsl(262_60%_70%_/_0.1)] p-1 rounded-xl">
+            <TabsTrigger 
+              value="tasks" 
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all"
+            >
+              <ListTodo className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Tâches</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="projects" 
+              className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground rounded-lg transition-all"
+            >
+              <FolderKanban className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Projets</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="types" 
+              className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground rounded-lg transition-all"
+            >
+              <Tag className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Types</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="stats" 
+              className="data-[state=active]:bg-sky data-[state=active]:text-foreground rounded-lg transition-all"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Stats</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tasks">
+            <TasksTab />
+          </TabsContent>
+
+          <TabsContent value="projects">
+            <ProjetsTab />
+          </TabsContent>
+
+          <TabsContent value="types">
+            <TypesTab />
+          </TabsContent>
+
+          <TabsContent value="stats">
+            <StatsTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
