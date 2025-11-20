@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ListTodo, FolderKanban, Tag, BarChart3 } from "lucide-react";
+import { ListTodo, BarChart3, Settings } from "lucide-react";
 import TasksTab from "@/components/tasks/TasksTab";
-import ProjetsTab from "@/components/projets/ProjetsTab";
-import TypesTab from "@/components/types/TypesTab";
 import StatsTab from "@/components/stats/StatsTab";
+import SettingsTab from "@/components/settings/SettingsTab";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("tasks");
@@ -22,7 +21,7 @@ const Index = () => {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-card shadow-[0_2px_8px_-1px_hsl(262_60%_70%_/_0.1)] p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-3 mb-8 bg-card shadow-[0_2px_8px_-1px_hsl(262_60%_70%_/_0.1)] p-1 rounded-xl">
             <TabsTrigger 
               value="tasks" 
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all"
@@ -31,25 +30,18 @@ const Index = () => {
               <span className="hidden sm:inline">Tâches</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="projects" 
-              className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground rounded-lg transition-all"
-            >
-              <FolderKanban className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Projets</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="types" 
-              className="data-[state=active]:bg-accent data-[state=active]:text-accent-foreground rounded-lg transition-all"
-            >
-              <Tag className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Types</span>
-            </TabsTrigger>
-            <TabsTrigger 
               value="stats" 
               className="data-[state=active]:bg-sky data-[state=active]:text-foreground rounded-lg transition-all"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="settings" 
+              className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground rounded-lg transition-all"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Paramètres</span>
             </TabsTrigger>
           </TabsList>
 
@@ -57,16 +49,12 @@ const Index = () => {
             <TasksTab />
           </TabsContent>
 
-          <TabsContent value="projects">
-            <ProjetsTab />
-          </TabsContent>
-
-          <TabsContent value="types">
-            <TypesTab />
-          </TabsContent>
-
           <TabsContent value="stats">
             <StatsTab />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <SettingsTab />
           </TabsContent>
         </Tabs>
       </div>
