@@ -30,6 +30,7 @@ const TasksTab = () => {
   const [filterProjet, setFilterProjet] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"importance" | "priorite" | "taille">("importance");
+  const [showCompleted, setShowCompleted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -59,6 +60,10 @@ const TasksTab = () => {
   useEffect(() => {
     let filtered = [...tasks];
     
+    if (!showCompleted) {
+      filtered = filtered.filter(t => !t.completed);
+    }
+    
     if (filterProjet) {
       filtered = filtered.filter(t => t.projet_id === filterProjet);
     }
@@ -76,7 +81,7 @@ const TasksTab = () => {
     });
     
     setFilteredTasks(filtered);
-  }, [tasks, filterProjet, filterType, sortBy]);
+  }, [tasks, filterProjet, filterType, sortBy, showCompleted]);
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
@@ -143,14 +148,16 @@ const TasksTab = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <TaskFilters
-          filterProjet={filterProjet}
-          setFilterProjet={setFilterProjet}
-          filterType={filterType}
-          setFilterType={setFilterType}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
+      <TaskFilters
+        filterProjet={filterProjet}
+        setFilterProjet={setFilterProjet}
+        filterType={filterType}
+        setFilterType={setFilterType}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        showCompleted={showCompleted}
+        setShowCompleted={setShowCompleted}
+      />
         <Button
           onClick={() => {
             setEditingTask(null);

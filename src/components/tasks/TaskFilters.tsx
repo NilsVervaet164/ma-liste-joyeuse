@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 type TaskFiltersProps = {
   filterProjet: string | null;
@@ -16,6 +17,8 @@ type TaskFiltersProps = {
   setFilterType: (id: string | null) => void;
   sortBy: "importance" | "priorite" | "taille";
   setSortBy: (sort: "importance" | "priorite" | "taille") => void;
+  showCompleted: boolean;
+  setShowCompleted: (show: boolean) => void;
 };
 
 const TaskFilters = ({
@@ -25,6 +28,8 @@ const TaskFilters = ({
   setFilterType,
   sortBy,
   setSortBy,
+  showCompleted,
+  setShowCompleted,
 }: TaskFiltersProps) => {
   const [projets, setProjets] = useState<any[]>([]);
   const [types, setTypes] = useState<any[]>([]);
@@ -95,9 +100,20 @@ const TaskFilters = ({
           <SelectContent>
             <SelectItem value="importance">Importance</SelectItem>
             <SelectItem value="priorite">Priorité</SelectItem>
-            <SelectItem value="taille">Taille</SelectItem>
-          </SelectContent>
-        </Select>
+          <SelectItem value="taille">Taille</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+
+      <div className="space-y-2 flex items-center gap-2">
+        <Switch 
+          id="show-completed" 
+          checked={showCompleted}
+          onCheckedChange={setShowCompleted}
+        />
+        <Label htmlFor="show-completed" className="cursor-pointer">
+          Afficher terminées
+        </Label>
       </div>
     </div>
   );
