@@ -47,8 +47,8 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
 
   return (
     <div 
-      className={`card-soft p-4 space-y-3 transition-all duration-300 ${
-        task.completed ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+      className={`card-soft p-4 space-y-3 transition-all duration-200 ${
+        task.completed ? 'opacity-60' : ''
       }`}
       style={projet ? { borderLeft: `4px solid ${projet.couleur}` } : undefined}
     >
