@@ -47,7 +47,9 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
 
   return (
     <div 
-      className={`card-soft p-4 space-y-3 ${task.completed ? 'opacity-60' : ''}`}
+      className={`card-soft p-4 space-y-3 transition-all duration-300 ${
+        task.completed ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+      }`}
       style={projet ? { borderLeft: `4px solid ${projet.couleur}` } : undefined}
     >
       <div className="flex items-start justify-between gap-2">
@@ -61,11 +63,6 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
             <h3 className={`font-semibold text-foreground ${task.completed ? 'line-through' : ''}`}>
               {task.titre}
             </h3>
-            {task.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {task.description}
-              </p>
-            )}
           </div>
         </div>
         <div className="flex gap-1">
@@ -122,18 +119,6 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
         {type && (
           <Badge variant="outline" className="border-accent text-accent-foreground">
             {type.nom}
-          </Badge>
-        )}
-        {projet && (
-          <Badge 
-            style={{ 
-              backgroundColor: projet.couleur + '20',
-              color: projet.couleur,
-              borderColor: projet.couleur
-            }}
-            className="border"
-          >
-            {projet.nom}
           </Badge>
         )}
       </div>
