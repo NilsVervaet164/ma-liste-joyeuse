@@ -13,11 +13,8 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <header className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">
-            Mes Tâches
+            Visual todo
           </h1>
-          <p className="text-muted-foreground">
-            Organisez votre travail avec style ✨
-          </p>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
