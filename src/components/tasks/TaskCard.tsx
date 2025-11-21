@@ -48,7 +48,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
   return (
     <div 
       className={`card-soft p-4 space-y-3 transition-all duration-200 ${
-        task.completed ? 'opacity-60' : ''
+        task.completed ? 'opacity-60 animate-card-lift' : ''
       }`}
       style={projet ? { borderLeft: `4px solid ${projet.couleur}` } : undefined}
     >
@@ -57,11 +57,19 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
           <Checkbox
             checked={task.completed}
             onCheckedChange={() => onToggleComplete(task)}
-            className="mt-1"
+            className={`mt-1 ${task.completed ? 'animate-checkbox-pulse' : ''}`}
           />
           <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-foreground ${task.completed ? 'line-through' : ''}`}>
-              {task.titre}
+            <h3 className="font-semibold text-foreground relative">
+              <span className={task.completed ? 'opacity-50' : ''}>
+                {task.titre}
+              </span>
+              {task.completed && (
+                <span 
+                  className="absolute left-0 top-1/2 h-[2px] bg-foreground/50 animate-strikethrough-grow"
+                  style={{ animationDelay: '50ms' }}
+                />
+              )}
             </h3>
           </div>
         </div>
@@ -91,8 +99,11 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
           <span className="text-xs text-muted-foreground w-20">Importance</span>
           <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary rounded-full transition-all"
-              style={{ width: `${task.importance}%` }}
+              className="h-full bg-primary rounded-full transition-all duration-300"
+              style={{ 
+                width: task.completed ? '0%' : `${task.importance}%`,
+                transitionDelay: task.completed ? '100ms' : '0ms'
+              }}
             />
           </div>
           <span className="text-xs font-medium w-8 text-right">{task.importance}</span>
@@ -101,8 +112,11 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
           <span className="text-xs text-muted-foreground w-20">Priorité</span>
           <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-secondary rounded-full transition-all"
-              style={{ width: `${task.priorite}%` }}
+              className="h-full bg-secondary rounded-full transition-all duration-300"
+              style={{ 
+                width: task.completed ? '0%' : `${task.priorite}%`,
+                transitionDelay: task.completed ? '150ms' : '0ms'
+              }}
             />
           </div>
           <span className="text-xs font-medium w-8 text-right">{task.priorite}</span>
