@@ -75,10 +75,43 @@ export default {
             height: "0",
           },
         },
+        "checkbox-pulse": {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.15)",
+          },
+        },
+        "strikethrough-grow": {
+          "0%": {
+            width: "0%",
+          },
+          "100%": {
+            width: "100%",
+          },
+        },
+        "card-lift": {
+          "0%": {
+            transform: "translateY(0)",
+            boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+          },
+          "50%": {
+            transform: "translateY(-4px)",
+            boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+          },
+          "100%": {
+            transform: "translateY(0)",
+            boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "checkbox-pulse": "checkbox-pulse 150ms ease-out",
+        "strikethrough-grow": "strikethrough-grow 200ms ease-out",
+        "card-lift": "card-lift 400ms ease-out",
       },
     },
   },
