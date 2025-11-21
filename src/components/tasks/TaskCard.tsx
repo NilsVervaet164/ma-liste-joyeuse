@@ -60,16 +60,8 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
             className={`mt-1 ${task.completed ? 'animate-checkbox-pulse' : ''}`}
           />
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground relative">
-              <span className={task.completed ? 'opacity-50' : ''}>
-                {task.titre}
-              </span>
-              {task.completed && (
-                <span 
-                  className="absolute left-0 top-1/2 h-[2px] bg-foreground/50 animate-strikethrough-grow"
-                  style={{ animationDelay: '50ms' }}
-                />
-              )}
+            <h3 className={`font-semibold text-foreground ${task.completed ? 'line-through opacity-50' : ''}`}>
+              {task.titre}
             </h3>
           </div>
         </div>
