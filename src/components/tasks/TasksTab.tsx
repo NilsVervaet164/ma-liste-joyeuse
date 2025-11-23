@@ -31,7 +31,6 @@ const TasksTab = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filterProjet, setFilterProjet] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"importance" | "priorite" | "taille">("importance");
   const [showCompleted, setShowCompleted] = useState(false);
   const { toast } = useToast();
@@ -76,10 +75,6 @@ const TasksTab = () => {
       filtered = filtered.filter(t => t.projet_id === filterProjet);
     }
     
-    if (filterType) {
-      filtered = filtered.filter(t => t.type_id === filterType);
-    }
-    
     // Sort
     filtered.sort((a, b) => {
       if (sortBy === "taille") {
@@ -89,7 +84,7 @@ const TasksTab = () => {
     });
     
     setFilteredTasks(filtered);
-  }, [tasks, filterProjet, filterType, sortBy, showCompleted, recentlyCompleted]);
+  }, [tasks, filterProjet, sortBy, showCompleted, recentlyCompleted]);
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
@@ -173,8 +168,6 @@ const TasksTab = () => {
       <TaskFilters
         filterProjet={filterProjet}
         setFilterProjet={setFilterProjet}
-        filterType={filterType}
-        setFilterType={setFilterType}
         sortBy={sortBy}
         setSortBy={setSortBy}
         showCompleted={showCompleted}

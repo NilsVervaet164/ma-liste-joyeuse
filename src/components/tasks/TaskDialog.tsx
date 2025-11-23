@@ -36,15 +36,12 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
   const [priorite, setPriorite] = useState(50);
   const [importance, setImportance] = useState(50);
   const [taille, setTaille] = useState<number | null>(null);
-  const [typeId, setTypeId] = useState<string>("");
   const [projetId, setProjetId] = useState<string>("");
-  const [types, setTypes] = useState<any[]>([]);
   const [projets, setProjets] = useState<any[]>([]);
   const { toast } = useToast();
   const debounceTimerRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    fetchTypes();
     fetchProjets();
   }, []);
 
@@ -58,7 +55,6 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
         setImportance(task.importance);
       }
       setTaille(task.taille);
-      setTypeId(task.type_id || "");
       // Projet uniquement pour les tâches principales
       if (!task.parent_id) {
         setProjetId(task.projet_id || "");
@@ -67,11 +63,6 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
       resetForm();
     }
   }, [task, open]);
-
-  const fetchTypes = async () => {
-    const { data } = await supabase.from('types').select('*');
-    setTypes(data || []);
-  };
 
   const fetchProjets = async () => {
     const { data } = await supabase.from('projets').select('*');
@@ -84,7 +75,6 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
     setPriorite(50);
     setImportance(50);
     setTaille(null);
-    setTypeId("");
     setProjetId("");
   };
 
@@ -132,7 +122,6 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
       priorite,
       importance,
       taille,
-      type_id: typeId || null,
       projet_id: projetId || null,
     };
 
@@ -204,29 +193,10 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select value={typeId} onValueChange={(value) => {
-                setTypeId(value);
-                if (task) autoSave({ type_id: value || null });
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {types.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.nom}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
+          <div className="space-y-2">
             {/* Projet uniquement pour les tâches principales */}
             {(!task || !task.parent_id) && (
-              <div className="space-y-2">
+              <>
                 <Label htmlFor="projet">Projet</Label>
                 <Select value={projetId} onValueChange={(value) => {
                   setProjetId(value);
@@ -243,7 +213,7 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </>
             )}
           </div>
 
