@@ -45,7 +45,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
 
   return (
     <div 
-      className={`card-soft p-4 space-y-3 transition-all duration-200 border-l-4 cursor-pointer ${
+      className={`card-soft p-4 space-y-3 cursor-pointer ${
         task.completed ? 'opacity-60 animate-card-lift' : ''
       }`}
       style={{
