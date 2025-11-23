@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Task } from "./TasksTab";
 import {
   Dialog,
@@ -25,11 +25,12 @@ type TaskDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task: Task | null;
+  onDelete?: (id: string) => void;
 };
 
 const TAILLES = [1, 2, 3, 5, 8, 13, 21, 34];
 
-const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
+const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => {
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [priorite, setPriorite] = useState(50);
@@ -40,6 +41,7 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
   const [types, setTypes] = useState<any[]>([]);
   const [projets, setProjets] = useState<any[]>([]);
   const { toast } = useToast();
+  const debounceTimerRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     fetchTypes();
@@ -80,6 +82,32 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
     setProjetId("");
   };
 
+  const autoSave = async (updates: Partial<Task>) => {
+    if (!task) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .update(updates)
+      .eq('id', task.id);
+
+    if (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const debouncedAutoSave = (updates: Partial<Task>) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      autoSave(updates);
+    }, 500);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -102,46 +130,32 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
       projet_id: projetId || null,
     };
 
-    if (task) {
-      const { error } = await supabase
-        .from('tasks')
-        .update(taskData)
-        .eq('id', task.id);
+    const { error } = await supabase
+      .from('tasks')
+      .insert(taskData);
 
-      if (error) {
-        toast({
-          title: "Erreur",
-          description: "Impossible de modifier la tâche",
-          variant: "destructive",
-        });
-        return;
-      }
-
+    if (error) {
       toast({
-        title: "Succès",
-        description: "Tâche modifiée",
+        title: "Erreur",
+        description: "Impossible de créer la tâche",
+        variant: "destructive",
       });
-    } else {
-      const { error } = await supabase
-        .from('tasks')
-        .insert(taskData);
-
-      if (error) {
-        toast({
-          title: "Erreur",
-          description: "Impossible de créer la tâche",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Succès",
-        description: "Tâche créée",
-      });
+      return;
     }
 
+    toast({
+      title: "Succès",
+      description: "Tâche créée",
+    });
+
     onOpenChange(false);
+  };
+
+  const handleDelete = () => {
+    if (task && onDelete) {
+      onDelete(task.id);
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -159,7 +173,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
             <Input
               id="titre"
               value={titre}
-              onChange={(e) => setTitre(e.target.value)}
+              onChange={(e) => {
+                setTitre(e.target.value);
+                if (task) debouncedAutoSave({ titre: e.target.value });
+              }}
               placeholder="Ma tâche..."
               required
             />
@@ -170,7 +187,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                if (task) debouncedAutoSave({ description: e.target.value || null });
+              }}
               placeholder="Détails de la tâche..."
               rows={3}
             />
@@ -179,7 +199,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
-              <Select value={typeId} onValueChange={setTypeId}>
+              <Select value={typeId} onValueChange={(value) => {
+                setTypeId(value);
+                if (task) autoSave({ type_id: value || null });
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir un type" />
                 </SelectTrigger>
@@ -195,7 +218,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="projet">Projet</Label>
-              <Select value={projetId} onValueChange={setProjetId}>
+              <Select value={projetId} onValueChange={(value) => {
+                setProjetId(value);
+                if (task) autoSave({ projet_id: value || null });
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir un projet" />
                 </SelectTrigger>
@@ -214,7 +240,11 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
             <Label htmlFor="taille">Taille (Fibonacci)</Label>
             <Select
               value={taille?.toString() || ""}
-              onValueChange={(v) => setTaille(v ? parseInt(v) : null)}
+              onValueChange={(v) => {
+                const newTaille = v ? parseInt(v) : null;
+                setTaille(newTaille);
+                if (task) autoSave({ taille: newTaille });
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Choisir une taille" />
@@ -234,7 +264,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
               <Label>Importance: {importance}</Label>
               <Slider
                 value={[importance]}
-                onValueChange={([v]) => setImportance(v)}
+                onValueChange={([v]) => {
+                  setImportance(v);
+                  if (task) autoSave({ importance: v });
+                }}
                 max={100}
                 step={1}
                 className="[&_[role=slider]]:bg-primary"
@@ -245,7 +278,10 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
               <Label>Priorité: {priorite}</Label>
               <Slider
                 value={[priorite]}
-                onValueChange={([v]) => setPriorite(v)}
+                onValueChange={([v]) => {
+                  setPriorite(v);
+                  if (task) autoSave({ priorite: v });
+                }}
                 max={100}
                 step={1}
                 className="[&_[role=slider]]:bg-secondary"
@@ -253,17 +289,30 @@ const TaskDialog = ({ open, onOpenChange, task }: TaskDialogProps) => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Annuler
-            </Button>
-            <Button type="submit" className="bg-primary text-primary-foreground">
-              {task ? "Modifier" : "Créer"}
-            </Button>
+          <div className="flex justify-between gap-3">
+            {task && onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                Supprimer
+              </Button>
+            )}
+            <div className="flex gap-3 ml-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Fermer
+              </Button>
+              {!task && (
+                <Button type="submit" className="bg-primary text-primary-foreground">
+                  Créer
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </DialogContent>
