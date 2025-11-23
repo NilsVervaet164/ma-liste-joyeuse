@@ -20,6 +20,9 @@ export type Task = {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  parent_id: string | null;
+  niveau: number;
+  ordre: number;
 };
 
 const TasksTab = () => {
@@ -60,6 +63,9 @@ const TasksTab = () => {
 
   useEffect(() => {
     let filtered = [...tasks];
+    
+    // Filtrer uniquement les tâches de niveau 0 (racine)
+    filtered = filtered.filter(t => !t.parent_id);
     
     if (!showCompleted) {
       // Garder les tâches récemment complétées pour permettre l'animation

@@ -82,4 +82,20 @@ All colors MUST be HSL.
     @apply rounded-lg px-4 py-2 font-medium transition-all duration-200 
            hover:scale-105 active:scale-95;
   }
+
+  /* Subtask connector line */
+  .subtask-connector {
+    position: relative;
+  }
+
+  .subtask-connector::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: hsl(var(--muted));
+    opacity: 0.5;
+  }
 }
