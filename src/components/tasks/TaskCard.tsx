@@ -128,35 +128,37 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
         )}
       </div>
 
-      {/* Progress bars */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground w-20">Importance</span>
-          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-300"
-              style={{ 
-                width: task.completed ? '0%' : `${task.importance}%`,
-                transitionDelay: task.completed ? '100ms' : '0ms'
-              }}
-            />
+      {/* Progress bars - uniquement pour les tâches principales */}
+      {isRootTask && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground w-20">Importance</span>
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-300"
+                style={{ 
+                  width: task.completed ? '0%' : `${task.importance}%`,
+                  transitionDelay: task.completed ? '100ms' : '0ms'
+                }}
+              />
+            </div>
+            <span className="text-xs font-medium w-8 text-right">{task.importance}</span>
           </div>
-          <span className="text-xs font-medium w-8 text-right">{task.importance}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground w-20">Priorité</span>
-          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-secondary rounded-full transition-all duration-300"
-              style={{ 
-                width: task.completed ? '0%' : `${task.priorite}%`,
-                transitionDelay: task.completed ? '150ms' : '0ms'
-              }}
-            />
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground w-20">Priorité</span>
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-secondary rounded-full transition-all duration-300"
+                style={{ 
+                  width: task.completed ? '0%' : `${task.priorite}%`,
+                  transitionDelay: task.completed ? '150ms' : '0ms'
+                }}
+              />
+            </div>
+            <span className="text-xs font-medium w-8 text-right">{task.priorite}</span>
           </div>
-          <span className="text-xs font-medium w-8 text-right">{task.priorite}</span>
         </div>
-      </div>
+      )}
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2">

@@ -52,11 +52,17 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
     if (task) {
       setTitre(task.titre);
       setDescription(task.description || "");
-      setPriorite(task.priorite);
-      setImportance(task.importance);
+      // Importance et priorité uniquement pour les tâches principales
+      if (!task.parent_id) {
+        setPriorite(task.priorite);
+        setImportance(task.importance);
+      }
       setTaille(task.taille);
       setTypeId(task.type_id || "");
-      setProjetId(task.projet_id || "");
+      // Projet uniquement pour les tâches principales
+      if (!task.parent_id) {
+        setProjetId(task.projet_id || "");
+      }
     } else {
       resetForm();
     }
@@ -163,7 +169,9 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            {task ? "Modifier la tâche" : "Nouvelle tâche"}
+            {task 
+              ? (task.parent_id ? "Modifier la sous-tâche" : "Modifier la tâche")
+              : "Nouvelle tâche"}
           </DialogTitle>
         </DialogHeader>
 
@@ -216,24 +224,27 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="projet">Projet</Label>
-              <Select value={projetId} onValueChange={(value) => {
-                setProjetId(value);
-                if (task) autoSave({ projet_id: value || null });
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un projet" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projets.map((projet) => (
-                    <SelectItem key={projet.id} value={projet.id}>
-                      {projet.nom}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Projet uniquement pour les tâches principales */}
+            {(!task || !task.parent_id) && (
+              <div className="space-y-2">
+                <Label htmlFor="projet">Projet</Label>
+                <Select value={projetId} onValueChange={(value) => {
+                  setProjetId(value);
+                  if (task) autoSave({ projet_id: value || null });
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisir un projet" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projets.map((projet) => (
+                      <SelectItem key={projet.id} value={projet.id}>
+                        {projet.nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -259,35 +270,38 @@ const TaskDialog = ({ open, onOpenChange, task, onDelete }: TaskDialogProps) => 
             </Select>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Importance: {importance}</Label>
-              <Slider
-                value={[importance]}
-                onValueChange={([v]) => {
-                  setImportance(v);
-                  if (task) autoSave({ importance: v });
-                }}
-                max={100}
-                step={1}
-                className="[&_[role=slider]]:bg-primary"
-              />
-            </div>
+          {/* Importance et priorité uniquement pour les tâches principales */}
+          {(!task || !task.parent_id) && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Importance: {importance}</Label>
+                <Slider
+                  value={[importance]}
+                  onValueChange={([v]) => {
+                    setImportance(v);
+                    if (task) autoSave({ importance: v });
+                  }}
+                  max={100}
+                  step={1}
+                  className="[&_[role=slider]]:bg-primary"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label>Priorité: {priorite}</Label>
-              <Slider
-                value={[priorite]}
-                onValueChange={([v]) => {
-                  setPriorite(v);
-                  if (task) autoSave({ priorite: v });
-                }}
-                max={100}
-                step={1}
-                className="[&_[role=slider]]:bg-secondary"
-              />
+              <div className="space-y-2">
+                <Label>Priorité: {priorite}</Label>
+                <Slider
+                  value={[priorite]}
+                  onValueChange={([v]) => {
+                    setPriorite(v);
+                    if (task) autoSave({ priorite: v });
+                  }}
+                  max={100}
+                  step={1}
+                  className="[&_[role=slider]]:bg-secondary"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex justify-between gap-3">
             {task && onDelete && (
