@@ -32,6 +32,7 @@ const TasksTab = () => {
   const [sortBy, setSortBy] = useState<"importance" | "priorite" | "taille">("importance");
   const [showCompleted, setShowCompleted] = useState(false);
   const { toast } = useToast();
+  const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchTasks();
@@ -61,7 +62,8 @@ const TasksTab = () => {
     let filtered = [...tasks];
     
     if (!showCompleted) {
-      filtered = filtered.filter(t => !t.completed);
+      // Garder les tâches récemment complétées pour permettre l'animation
+      filtered = filtered.filter(t => !t.completed || recentlyCompleted.has(t.id));
     }
     
     if (filterProjet) {
@@ -81,7 +83,7 @@ const TasksTab = () => {
     });
     
     setFilteredTasks(filtered);
-  }, [tasks, filterProjet, filterType, sortBy, showCompleted]);
+  }, [tasks, filterProjet, filterType, sortBy, showCompleted, recentlyCompleted]);
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
@@ -128,6 +130,20 @@ const TasksTab = () => {
   };
 
   const handleToggleComplete = async (task: Task) => {
+    if (!task.completed && !showCompleted) {
+      // Marquer comme récemment complété pour garder l'animation
+      setRecentlyCompleted(prev => new Set(prev).add(task.id));
+      
+      // Retirer après l'animation (600ms pour toutes les animations)
+      setTimeout(() => {
+        setRecentlyCompleted(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(task.id);
+          return newSet;
+        });
+      }, 600);
+    }
+
     const { error } = await supabase
       .from('tasks')
       .update({
