@@ -49,6 +49,9 @@ export type Database = {
           description: string | null
           id: string
           importance: number | null
+          niveau: number
+          ordre: number
+          parent_id: string | null
           priorite: number | null
           projet_id: string | null
           taille: number | null
@@ -63,6 +66,9 @@ export type Database = {
           description?: string | null
           id?: string
           importance?: number | null
+          niveau?: number
+          ordre?: number
+          parent_id?: string | null
           priorite?: number | null
           projet_id?: string | null
           taille?: number | null
@@ -77,6 +83,9 @@ export type Database = {
           description?: string | null
           id?: string
           importance?: number | null
+          niveau?: number
+          ordre?: number
+          parent_id?: string | null
           priorite?: number | null
           projet_id?: string | null
           taille?: number | null
@@ -85,6 +94,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_projet_id_fkey"
             columns: ["projet_id"]
