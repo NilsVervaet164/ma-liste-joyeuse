@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Task } from "./TasksTab";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 
@@ -47,16 +45,18 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
 
   return (
     <div 
-      className={`card-soft p-4 space-y-3 transition-all duration-200 ${
+      className={`card-soft p-4 space-y-3 transition-all duration-200 cursor-pointer ${
         task.completed ? 'opacity-60 animate-card-lift' : ''
       }`}
       style={projet ? { borderLeft: `4px solid ${projet.couleur}` } : undefined}
+      onClick={() => onEdit(task)}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-3 flex-1">
           <Checkbox
             checked={task.completed}
             onCheckedChange={() => onToggleComplete(task)}
+            onClick={(e) => e.stopPropagation()}
             className={`mt-1 ${task.completed ? 'animate-checkbox-pulse' : ''}`}
           />
           <div className="flex-1 min-w-0">
@@ -64,24 +64,6 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
               {task.titre}
             </h3>
           </div>
-        </div>
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(task)}
-            className="h-8 w-8 hover:bg-primary/10"
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(task.id)}
-            className="h-8 w-8 hover:bg-destructive/10"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 

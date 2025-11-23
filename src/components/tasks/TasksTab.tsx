@@ -181,6 +181,7 @@ const TasksTab = () => {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         task={editingTask}
+        onDelete={handleDelete}
       />
     </div>
   );
