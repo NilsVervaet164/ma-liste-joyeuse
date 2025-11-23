@@ -15,10 +15,9 @@ type SubTaskItemProps = {
   level: number;
   onEdit: (task: Task) => void;
   onToggleComplete: (task: Task) => void;
-  type?: { nom: string } | null;
 };
 
-const SubTaskItem = ({ task, level, onEdit, onToggleComplete, type }: SubTaskItemProps) => {
+const SubTaskItem = ({ task, level, onEdit, onToggleComplete }: SubTaskItemProps) => {
   const [showAddInput, setShowAddInput] = useState(false);
   const [newSubTaskTitle, setNewSubTaskTitle] = useState("");
   const { subTasks, toggleExpanded, isExpanded, stats } = useSubTasks(task.id);
@@ -113,11 +112,6 @@ const SubTaskItem = ({ task, level, onEdit, onToggleComplete, type }: SubTaskIte
           {task.taille && (
             <Badge className={`${getTailleBadgeColor(task.taille)} text-xs`}>
               {task.taille}
-            </Badge>
-          )}
-          {type && (
-            <Badge variant="outline" className="text-xs border-accent text-accent-foreground">
-              {type.nom}
             </Badge>
           )}
           {hasSubTasks && (

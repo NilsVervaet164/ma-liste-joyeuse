@@ -18,7 +18,6 @@ type TaskCardProps = {
 
 const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) => {
   const [projet, setProjet] = useState<{ nom: string; couleur: string } | null>(null);
-  const [type, setType] = useState<{ nom: string } | null>(null);
   const [showSubTasks, setShowSubTasks] = useState(false);
   const { createSubTask } = useTaskHierarchy();
   const { subTasks, stats } = useSubTasks(task.id);
@@ -36,16 +35,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
         .single()
         .then(({ data }) => setProjet(data));
     }
-    
-    if (task.type_id) {
-      supabase
-        .from('types')
-        .select('nom')
-        .eq('id', task.type_id)
-        .single()
-        .then(({ data }) => setType(data));
-    }
-  }, [task.projet_id, task.type_id]);
+  }, [task.projet_id]);
 
   const getTailleBadgeColor = (taille: number | null) => {
     if (!taille) return "bg-muted";
@@ -165,11 +155,6 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }: TaskCardProps) =
         {task.taille && (
           <Badge className={getTailleBadgeColor(task.taille)}>
             {task.taille}
-          </Badge>
-        )}
-        {type && (
-          <Badge variant="outline" className="border-accent text-accent-foreground">
-            {type.nom}
           </Badge>
         )}
         {isRootTask && stats.totalPoints > 0 && (
