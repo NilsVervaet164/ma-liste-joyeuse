@@ -29,17 +29,6 @@ export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask }: TaskCanvasProps
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-primary/60"></span>
-          Tâche principale
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-secondary-foreground/40"></span>
-          Sous-tâche
-        </span>
-      </div>
-      
       <div className="relative">
         {/* Y-axis label */}
         <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-medium text-muted-foreground whitespace-nowrap">
@@ -85,12 +74,6 @@ export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask }: TaskCanvasProps
           <div className="absolute bottom-3 right-3 text-xs text-muted-foreground/50 font-medium">
             Non important · Urgent
           </div>
-
-          {/* Axis values */}
-          <div className="absolute left-2 top-0 text-[10px] text-muted-foreground/40">100</div>
-          <div className="absolute left-2 bottom-0 text-[10px] text-muted-foreground/40">0</div>
-          <div className="absolute left-0 bottom-2 text-[10px] text-muted-foreground/40">0</div>
-          <div className="absolute right-2 bottom-2 text-[10px] text-muted-foreground/40">100</div>
 
           {/* Task nodes */}
           {tasks.map(task => (
