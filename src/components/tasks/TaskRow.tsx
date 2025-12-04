@@ -152,13 +152,15 @@ const TaskRow = ({ task, level, onEdit, onDelete, onToggleComplete }: TaskRowPro
           </div>
         )}
 
-        {/* Badges */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Badges - fixed width containers for consistent alignment */}
+        <div className="w-12 flex justify-end shrink-0">
           {hasSubTasks && (
             <Badge variant="secondary" className="text-xs">
               {stats.completed}/{stats.total}
             </Badge>
           )}
+        </div>
+        <div className="w-8 flex justify-end shrink-0">
           {task.taille && (
             <Badge className={`${getTailleBadgeColor(task.taille)} text-xs`}>
               {task.taille}
