@@ -1,5 +1,5 @@
 import { Task } from "./TasksTab";
-import TaskCard from "./TaskCard";
+import TaskRow from "./TaskRow";
 
 type TaskListProps = {
   tasks: Task[];
@@ -20,11 +20,12 @@ const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete }: TaskListProps) 
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="card-soft divide-y divide-border/50">
       {tasks.map((task) => (
-        <TaskCard
+        <TaskRow
           key={task.id}
           task={task}
+          level={0}
           onEdit={onEdit}
           onDelete={onDelete}
           onToggleComplete={onToggleComplete}
