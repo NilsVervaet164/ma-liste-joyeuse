@@ -83,19 +83,16 @@ All colors MUST be HSL.
            hover:scale-105 active:scale-95;
   }
 
-  /* Subtask connector line */
-  .subtask-connector {
-    position: relative;
+  /* Task row styles */
+  .task-row {
+    @apply border-l-transparent transition-colors;
   }
 
-  .subtask-connector::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: hsl(var(--muted));
-    opacity: 0.5;
+  .task-row:first-child {
+    @apply rounded-t-xl;
+  }
+
+  .task-row:last-child {
+    @apply rounded-b-xl;
   }
 }
