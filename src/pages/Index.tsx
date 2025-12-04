@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ListTodo, BarChart3, Settings } from "lucide-react";
+import { ListTodo, BarChart3, Settings, Network } from "lucide-react";
 import TasksTab from "@/components/tasks/TasksTab";
 import StatsTab from "@/components/stats/StatsTab";
 import SettingsTab from "@/components/settings/SettingsTab";
+import { CanvasTab } from "@/components/canvas/CanvasTab";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("tasks");
@@ -18,13 +19,20 @@ const Index = () => {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-card shadow-[0_2px_8px_-1px_hsl(262_60%_70%_/_0.1)] p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-card shadow-[0_2px_8px_-1px_hsl(262_60%_70%_/_0.1)] p-1 rounded-xl">
             <TabsTrigger 
               value="tasks" 
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all"
             >
               <ListTodo className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Tâches</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="canvas" 
+              className="data-[state=active]:bg-coral data-[state=active]:text-foreground rounded-lg transition-all"
+            >
+              <Network className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Canvas</span>
             </TabsTrigger>
             <TabsTrigger 
               value="stats" 
@@ -44,6 +52,10 @@ const Index = () => {
 
           <TabsContent value="tasks">
             <TasksTab />
+          </TabsContent>
+
+          <TabsContent value="canvas">
+            <CanvasTab />
           </TabsContent>
 
           <TabsContent value="stats">
