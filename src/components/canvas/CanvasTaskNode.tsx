@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject } from "react";
+import { useState, useEffect, useRef, RefObject } from "react";
 import { Task } from "@/components/tasks/TasksTab";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -21,6 +21,8 @@ export const CanvasTaskNode = ({
 }: CanvasTaskNodeProps) => {
   const [project, setProject] = useState<{ couleur: string } | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
+  const [pendingPos, setPendingPos] = useState<{ x: number; y: number } | null>(null);
+  const prevTaskRef = useRef({ importance: task.importance, priorite: task.priorite });
 
   useEffect(() => {
     if (task.projet_id) {
@@ -32,6 +34,18 @@ export const CanvasTaskNode = ({
         .then(({ data }) => setProject(data));
     }
   }, [task.projet_id]);
+
+  // Clear pending position when task values are updated from database
+  useEffect(() => {
+    if (
+      pendingPos &&
+      (prevTaskRef.current.importance !== task.importance ||
+        prevTaskRef.current.priorite !== task.priorite)
+    ) {
+      setPendingPos(null);
+    }
+    prevTaskRef.current = { importance: task.importance, priorite: task.priorite };
+  }, [task.importance, task.priorite, pendingPos]);
 
   const getSize = (taille: number | null) => {
     if (!taille || taille <= 2) return 56;
@@ -62,8 +76,10 @@ export const CanvasTaskNode = ({
       const rect = canvasRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      onDragEnd(x, y);
+      // Keep position as pending until DB updates
+      setPendingPos({ x, y });
       setDragPos(null);
+      onDragEnd(x, y);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
@@ -72,9 +88,11 @@ export const CanvasTaskNode = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  // Calculate position based on importance (Y inverted) and priority (X)
-  const baseX = dragPos ? dragPos.x : `${priority}%`;
-  const baseY = dragPos ? dragPos.y : `${100 - importance}%`;
+  // Position: drag > pending > percentage
+  const currentPos = dragPos || pendingPos;
+  const baseX = currentPos ? currentPos.x : `${priority}%`;
+  const baseY = currentPos ? currentPos.y : `${100 - importance}%`;
+  const isAnimating = !dragPos && !pendingPos;
 
   const projectColor = project?.couleur || 'hsl(var(--primary))';
 
@@ -84,7 +102,7 @@ export const CanvasTaskNode = ({
 
   return (
     <div
-      className="absolute transition-all duration-200"
+      className={`absolute ${isAnimating ? 'transition-all duration-200' : ''}`}
       style={{
         left: typeof baseX === 'string' ? baseX : `${baseX}px`,
         top: typeof baseY === 'string' ? baseY : `${baseY}px`,
