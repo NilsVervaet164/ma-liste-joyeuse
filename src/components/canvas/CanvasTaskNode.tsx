@@ -51,6 +51,14 @@ export const CanvasTaskNode = ({
     prevTaskRef.current = { importance: task.importance, priorite: task.priorite };
   }, [task.importance, task.priorite, pendingPos]);
 
+  const getTailleBadgeColor = (taille: number | null) => {
+    if (!taille) return "bg-muted text-muted-foreground";
+    if (taille <= 2) return "bg-mint text-foreground";
+    if (taille <= 5) return "bg-primary text-primary-foreground";
+    if (taille <= 13) return "bg-secondary text-secondary-foreground";
+    return "bg-coral text-white";
+  };
+
   const getSize = (taille: number | null) => {
     if (!taille || taille <= 2) return { w: 72, h: 40 };
     if (taille <= 5) return { w: 88, h: 48 };
@@ -197,7 +205,11 @@ export const CanvasTaskNode = ({
             title={subTask.titre}
             onClick={() => onTaskClick(subTask)}
           >
-            {subTask.taille || ''}
+            {subTask.taille && (
+              <span className={`${getTailleBadgeColor(subTask.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium`}>
+                {subTask.taille}
+              </span>
+            )}
           </div>
         );
       })}
@@ -223,9 +235,9 @@ export const CanvasTaskNode = ({
         >
           {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}
         </span>
-        {task.taille && size.w >= 88 && (
-          <span className="text-[8px] text-muted-foreground mt-0.5">
-            {task.taille} pts
+        {task.taille && (
+          <span className={`${getTailleBadgeColor(task.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium mt-1`}>
+            {task.taille}
           </span>
         )}
       </div>
