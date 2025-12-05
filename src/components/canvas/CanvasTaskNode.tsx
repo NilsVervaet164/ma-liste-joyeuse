@@ -218,7 +218,7 @@ export const CanvasTaskNode = ({
       <div
         onMouseDown={handleMouseDown}
         className={`
-          relative rounded-2xl bg-card border-2 shadow-lg flex flex-col items-center justify-center
+          relative rounded-2xl bg-card border-2 shadow-lg flex items-center gap-1.5 px-2
           cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow
           ${isDragging ? 'ring-2 ring-primary ring-offset-2' : ''}
         `}
@@ -229,17 +229,17 @@ export const CanvasTaskNode = ({
           backgroundColor: `color-mix(in srgb, ${projectColor} 10%, hsl(var(--card)))`,
         }}
       >
+        {task.taille && (
+          <span className={`${getTailleBadgeColor(task.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium shrink-0`}>
+            {task.taille}
+          </span>
+        )}
         <span 
-          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center px-2 line-clamp-2`}
+          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center flex-1 line-clamp-2`}
           title={task.titre}
         >
           {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}
         </span>
-        {task.taille && (
-          <span className={`${getTailleBadgeColor(task.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium mt-1`}>
-            {task.taille}
-          </span>
-        )}
       </div>
 
       {/* Subtask count badge */}
