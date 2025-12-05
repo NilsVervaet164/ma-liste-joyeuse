@@ -1,14 +1,18 @@
 import { useRef, useState } from "react";
 import { Task } from "@/components/tasks/TasksTab";
 import { CanvasTaskNode } from "./CanvasTaskNode";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface TaskCanvasProps {
   tasks: Task[];
   subTasksMap: Map<string, Task[]>;
   onUpdateTask: (taskId: string, importance: number, priority: number) => void;
+  showSubTasks: boolean;
+  onToggleSubTasks: (value: boolean) => void;
 }
 
-export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask }: TaskCanvasProps) => {
+export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask, showSubTasks, onToggleSubTasks }: TaskCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -29,6 +33,17 @@ export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask }: TaskCanvasProps
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Switch
+          id="show-subtasks"
+          checked={showSubTasks}
+          onCheckedChange={onToggleSubTasks}
+        />
+        <Label htmlFor="show-subtasks" className="text-sm text-muted-foreground cursor-pointer">
+          Afficher sous-tâches
+        </Label>
+      </div>
+
       <div className="relative">
         {/* Y-axis label */}
         <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-medium text-muted-foreground whitespace-nowrap">
@@ -85,6 +100,7 @@ export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask }: TaskCanvasProps
               isDragging={draggingId === task.id}
               onDragStart={() => handleDragStart(task.id)}
               onDragEnd={(x, y) => handleDragEnd(task.id, x, y)}
+              showSubTasks={showSubTasks}
             />
           ))}
         </div>

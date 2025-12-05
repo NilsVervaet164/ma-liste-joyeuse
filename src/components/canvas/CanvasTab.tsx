@@ -6,6 +6,7 @@ import { TaskCanvas } from "./TaskCanvas";
 export const CanvasTab = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSubTasks, setShowSubTasks] = useState(true);
 
   useEffect(() => {
     fetchTasks();
@@ -66,7 +67,9 @@ export const CanvasTab = () => {
     <TaskCanvas 
       tasks={rootTasks} 
       subTasksMap={subTasksMap}
-      onUpdateTask={handleUpdateTask} 
+      onUpdateTask={handleUpdateTask}
+      showSubTasks={showSubTasks}
+      onToggleSubTasks={setShowSubTasks}
     />
   );
 };
