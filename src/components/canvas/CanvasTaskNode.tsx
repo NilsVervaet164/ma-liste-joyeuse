@@ -52,18 +52,18 @@ export const CanvasTaskNode = ({
   }, [task.importance, task.priorite, pendingPos]);
 
   const getSize = (taille: number | null) => {
-    if (!taille || taille <= 2) return 56;
-    if (taille <= 5) return 72;
-    if (taille <= 13) return 88;
-    return 104;
+    if (!taille || taille <= 2) return { w: 72, h: 40 };
+    if (taille <= 5) return { w: 88, h: 48 };
+    if (taille <= 13) return { w: 104, h: 56 };
+    return { w: 120, h: 64 };
   };
 
-  const getFontConfig = (size: number) => {
-    switch (size) {
-      case 56: return { fontSize: 'text-[8px]', maxChars: 14, lineHeight: 'leading-tight' };
-      case 72: return { fontSize: 'text-[9px]', maxChars: 18, lineHeight: 'leading-tight' };
-      case 88: return { fontSize: 'text-[10px]', maxChars: 22, lineHeight: 'leading-snug' };
-      default: return { fontSize: 'text-xs', maxChars: 26, lineHeight: 'leading-snug' };
+  const getFontConfig = (size: { w: number; h: number }) => {
+    switch (size.w) {
+      case 72: return { fontSize: 'text-[9px]', maxChars: 16, lineHeight: 'leading-tight' };
+      case 88: return { fontSize: 'text-[10px]', maxChars: 20, lineHeight: 'leading-tight' };
+      case 104: return { fontSize: 'text-xs', maxChars: 24, lineHeight: 'leading-snug' };
+      default: return { fontSize: 'text-xs', maxChars: 28, lineHeight: 'leading-snug' };
     }
   };
 
@@ -127,9 +127,9 @@ export const CanvasTaskNode = ({
 
   const projectColor = project?.couleur || 'hsl(var(--primary))';
 
-  // Distribute subtasks in a circle around the parent
-  const subTaskRadius = size * 0.9;
-  const subTaskSize = 32;
+  // Distribute subtasks around the parent
+  const subTaskRadius = Math.max(size.w, size.h) * 0.8;
+  const subTaskSize = { w: 48, h: 28 };
 
   return (
     <div
@@ -146,18 +146,18 @@ export const CanvasTaskNode = ({
         <svg
           className="absolute pointer-events-none"
           style={{
-            width: subTaskRadius * 2 + subTaskSize,
-            height: subTaskRadius * 2 + subTaskSize,
-            left: -(subTaskRadius + subTaskSize / 2 - size / 2),
-            top: -(subTaskRadius + subTaskSize / 2 - size / 2),
+            width: subTaskRadius * 2 + subTaskSize.w,
+            height: subTaskRadius * 2 + subTaskSize.h,
+            left: -(subTaskRadius + subTaskSize.w / 2 - size.w / 2),
+            top: -(subTaskRadius + subTaskSize.h / 2 - size.h / 2),
           }}
         >
           {subTasks.map((_, index) => {
             const angle = (index / subTasks.length) * 2 * Math.PI - Math.PI / 2;
-            const x = (subTaskRadius + subTaskSize / 2) + Math.cos(angle) * subTaskRadius;
-            const y = (subTaskRadius + subTaskSize / 2) + Math.sin(angle) * subTaskRadius;
-            const centerX = subTaskRadius + subTaskSize / 2;
-            const centerY = subTaskRadius + subTaskSize / 2;
+            const x = (subTaskRadius + subTaskSize.w / 2) + Math.cos(angle) * subTaskRadius;
+            const y = (subTaskRadius + subTaskSize.h / 2) + Math.sin(angle) * subTaskRadius;
+            const centerX = subTaskRadius + subTaskSize.w / 2;
+            const centerY = subTaskRadius + subTaskSize.h / 2;
             
             return (
               <line
@@ -185,12 +185,12 @@ export const CanvasTaskNode = ({
         return (
           <div
             key={subTask.id}
-            className="absolute rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center text-[10px] font-medium text-muted-foreground hover:scale-110 transition-transform cursor-pointer"
+            className="absolute rounded-xl bg-card border border-border/50 shadow-sm flex items-center justify-center text-[9px] font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer"
             style={{
-              width: subTaskSize,
-              height: subTaskSize,
-              left: x - subTaskSize / 2 + size / 2,
-              top: y - subTaskSize / 2 + size / 2,
+              width: subTaskSize.w,
+              height: subTaskSize.h,
+              left: x - subTaskSize.w / 2 + size.w / 2,
+              top: y - subTaskSize.h / 2 + size.h / 2,
               borderColor: projectColor,
               borderWidth: 2,
             }}
@@ -206,24 +206,24 @@ export const CanvasTaskNode = ({
       <div
         onMouseDown={handleMouseDown}
         className={`
-          relative rounded-full bg-card border-2 shadow-lg flex flex-col items-center justify-center
+          relative rounded-2xl bg-card border-2 shadow-lg flex flex-col items-center justify-center
           cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow
           ${isDragging ? 'ring-2 ring-primary ring-offset-2' : ''}
         `}
         style={{
-          width: size,
-          height: size,
+          width: size.w,
+          height: size.h,
           borderColor: projectColor,
           backgroundColor: `color-mix(in srgb, ${projectColor} 10%, hsl(var(--card)))`,
         }}
       >
         <span 
-          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center px-1.5 line-clamp-2`}
+          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center px-2 line-clamp-2`}
           title={task.titre}
         >
           {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}
         </span>
-        {task.taille && size >= 72 && (
+        {task.taille && size.w >= 88 && (
           <span className="text-[8px] text-muted-foreground mt-0.5">
             {task.taille} pts
           </span>
