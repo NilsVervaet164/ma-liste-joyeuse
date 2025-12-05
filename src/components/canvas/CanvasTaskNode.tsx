@@ -63,18 +63,18 @@ export const CanvasTaskNode = ({
   };
 
   const getSize = (taille: number | null) => {
-    if (!taille || taille <= 2) return { w: 72, h: 40 };
-    if (taille <= 5) return { w: 88, h: 48 };
-    if (taille <= 13) return { w: 104, h: 56 };
-    return { w: 120, h: 64 };
+    if (!taille || taille <= 2) return { w: 120, h: 56 };
+    if (taille <= 5) return { w: 140, h: 64 };
+    if (taille <= 13) return { w: 160, h: 72 };
+    return { w: 180, h: 80 };
   };
 
   const getFontConfig = (size: { w: number; h: number }) => {
     switch (size.w) {
-      case 72: return { fontSize: 'text-[9px]', maxChars: 16, lineHeight: 'leading-tight' };
-      case 88: return { fontSize: 'text-[10px]', maxChars: 20, lineHeight: 'leading-tight' };
-      case 104: return { fontSize: 'text-xs', maxChars: 24, lineHeight: 'leading-snug' };
-      default: return { fontSize: 'text-xs', maxChars: 28, lineHeight: 'leading-snug' };
+      case 120: return { fontSize: 'text-xs', maxChars: 20, lineHeight: 'leading-tight' };
+      case 140: return { fontSize: 'text-sm', maxChars: 24, lineHeight: 'leading-tight' };
+      case 160: return { fontSize: 'text-sm', maxChars: 28, lineHeight: 'leading-snug' };
+      default: return { fontSize: 'text-base', maxChars: 32, lineHeight: 'leading-snug' };
     }
   };
 
@@ -139,8 +139,8 @@ export const CanvasTaskNode = ({
   const projectColor = project?.couleur || 'hsl(var(--primary))';
 
   // Distribute subtasks around the parent
-  const subTaskRadius = Math.max(size.w, size.h) * 0.8;
-  const subTaskSize = { w: 48, h: 28 };
+  const subTaskRadius = Math.max(size.w, size.h) * 0.9;
+  const subTaskSize = { w: 80, h: 36 };
 
   return (
     <div
@@ -196,7 +196,7 @@ export const CanvasTaskNode = ({
         return (
           <div
             key={subTask.id}
-            className={`absolute rounded-xl bg-card shadow-sm flex items-center gap-1 px-1.5 text-[9px] font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer ${subTask.completed ? 'opacity-50' : ''}`}
+            className={`absolute rounded-xl bg-card shadow-sm flex items-center gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer ${subTask.completed ? 'opacity-50' : ''}`}
             style={{
               width: subTaskSize.w,
               height: subTaskSize.h,
@@ -211,13 +211,13 @@ export const CanvasTaskNode = ({
           >
             <Checkbox
               checked={subTask.completed}
-              className="h-3 w-3 shrink-0"
+              className="h-3.5 w-3.5 shrink-0"
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
               onCheckedChange={() => onToggleComplete(subTask)}
             />
             {subTask.taille && (
-              <span className={`${getTailleBadgeColor(subTask.taille)} text-[7px] px-1 py-0.5 rounded-full font-medium`}>
+              <span className={`${getTailleBadgeColor(subTask.taille)} text-[9px] px-1.5 py-0.5 rounded-full font-medium`}>
                 {subTask.taille}
               </span>
             )}
@@ -244,13 +244,13 @@ export const CanvasTaskNode = ({
       >
         <Checkbox
           checked={task.completed}
-          className="h-3.5 w-3.5 shrink-0"
+          className="h-4 w-4 shrink-0"
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onCheckedChange={() => onToggleComplete(task)}
         />
         {task.taille && (
-          <span className={`${getTailleBadgeColor(task.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium shrink-0`}>
+          <span className={`${getTailleBadgeColor(task.taille)} text-xs px-2 py-0.5 rounded-full font-medium shrink-0`}>
             {task.taille}
           </span>
         )}
