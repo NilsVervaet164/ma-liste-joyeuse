@@ -9,6 +9,7 @@ interface CanvasTaskNodeProps {
   isDragging: boolean;
   onDragStart: () => void;
   onDragEnd: (x: number, y: number) => void;
+  showSubTasks: boolean;
 }
 
 export const CanvasTaskNode = ({
@@ -18,6 +19,7 @@ export const CanvasTaskNode = ({
   isDragging,
   onDragStart,
   onDragEnd,
+  showSubTasks,
 }: CanvasTaskNodeProps) => {
   const [project, setProject] = useState<{ couleur: string } | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
@@ -54,7 +56,17 @@ export const CanvasTaskNode = ({
     return 104;
   };
 
+  const getFontConfig = (size: number) => {
+    switch (size) {
+      case 56: return { fontSize: 'text-[8px]', maxChars: 14, lineHeight: 'leading-tight' };
+      case 72: return { fontSize: 'text-[9px]', maxChars: 18, lineHeight: 'leading-tight' };
+      case 88: return { fontSize: 'text-[10px]', maxChars: 22, lineHeight: 'leading-snug' };
+      default: return { fontSize: 'text-xs', maxChars: 26, lineHeight: 'leading-snug' };
+    }
+  };
+
   const size = getSize(task.taille);
+  const fontConfig = getFontConfig(size);
   const importance = task.importance ?? 50;
   const priority = task.priorite ?? 50;
 
@@ -111,40 +123,42 @@ export const CanvasTaskNode = ({
       }}
     >
       {/* Connection lines to subtasks */}
-      <svg
-        className="absolute pointer-events-none"
-        style={{
-          width: subTaskRadius * 2 + subTaskSize,
-          height: subTaskRadius * 2 + subTaskSize,
-          left: -(subTaskRadius + subTaskSize / 2 - size / 2),
-          top: -(subTaskRadius + subTaskSize / 2 - size / 2),
-        }}
-      >
-        {subTasks.map((_, index) => {
-          const angle = (index / subTasks.length) * 2 * Math.PI - Math.PI / 2;
-          const x = (subTaskRadius + subTaskSize / 2) + Math.cos(angle) * subTaskRadius;
-          const y = (subTaskRadius + subTaskSize / 2) + Math.sin(angle) * subTaskRadius;
-          const centerX = subTaskRadius + subTaskSize / 2;
-          const centerY = subTaskRadius + subTaskSize / 2;
-          
-          return (
-            <line
-              key={index}
-              x1={centerX}
-              y1={centerY}
-              x2={x}
-              y2={y}
-              stroke={projectColor}
-              strokeWidth="1.5"
-              strokeOpacity="0.3"
-              strokeDasharray="4 2"
-            />
-          );
-        })}
-      </svg>
+      {showSubTasks && subTasks.length > 0 && (
+        <svg
+          className="absolute pointer-events-none"
+          style={{
+            width: subTaskRadius * 2 + subTaskSize,
+            height: subTaskRadius * 2 + subTaskSize,
+            left: -(subTaskRadius + subTaskSize / 2 - size / 2),
+            top: -(subTaskRadius + subTaskSize / 2 - size / 2),
+          }}
+        >
+          {subTasks.map((_, index) => {
+            const angle = (index / subTasks.length) * 2 * Math.PI - Math.PI / 2;
+            const x = (subTaskRadius + subTaskSize / 2) + Math.cos(angle) * subTaskRadius;
+            const y = (subTaskRadius + subTaskSize / 2) + Math.sin(angle) * subTaskRadius;
+            const centerX = subTaskRadius + subTaskSize / 2;
+            const centerY = subTaskRadius + subTaskSize / 2;
+            
+            return (
+              <line
+                key={index}
+                x1={centerX}
+                y1={centerY}
+                x2={x}
+                y2={y}
+                stroke={projectColor}
+                strokeWidth="1.5"
+                strokeOpacity="0.3"
+                strokeDasharray="4 2"
+              />
+            );
+          })}
+        </svg>
+      )}
 
       {/* Subtask nodes */}
-      {subTasks.map((subTask, index) => {
+      {showSubTasks && subTasks.map((subTask, index) => {
         const angle = (index / subTasks.length) * 2 * Math.PI - Math.PI / 2;
         const x = Math.cos(angle) * subTaskRadius;
         const y = Math.sin(angle) * subTaskRadius;
@@ -184,13 +198,13 @@ export const CanvasTaskNode = ({
         }}
       >
         <span 
-          className="text-xs font-medium text-center px-2 line-clamp-2 leading-tight"
+          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center px-1.5 line-clamp-2`}
           title={task.titre}
         >
-          {task.titre.length > 20 ? task.titre.substring(0, 18) + '...' : task.titre}
+          {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}
         </span>
-        {task.taille && (
-          <span className="text-[10px] text-muted-foreground mt-0.5">
+        {task.taille && size >= 72 && (
+          <span className="text-[8px] text-muted-foreground mt-0.5">
             {task.taille} pts
           </span>
         )}
