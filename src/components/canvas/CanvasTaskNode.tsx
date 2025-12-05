@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, RefObject } from "react";
 import { Task } from "@/components/tasks/TasksTab";
 import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CanvasTaskNodeProps {
   task: Task;
@@ -11,6 +12,7 @@ interface CanvasTaskNodeProps {
   onDragEnd: (x: number, y: number) => void;
   showSubTasks: boolean;
   onTaskClick: (task: Task) => void;
+  onToggleComplete: (task: Task) => void;
 }
 
 export const CanvasTaskNode = ({
@@ -22,6 +24,7 @@ export const CanvasTaskNode = ({
   onDragEnd,
   showSubTasks,
   onTaskClick,
+  onToggleComplete,
 }: CanvasTaskNodeProps) => {
   const [project, setProject] = useState<{ couleur: string } | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
@@ -193,7 +196,7 @@ export const CanvasTaskNode = ({
         return (
           <div
             key={subTask.id}
-            className="absolute rounded-xl bg-card border border-border/50 shadow-sm flex items-center justify-center text-[9px] font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer"
+            className={`absolute rounded-xl bg-card shadow-sm flex items-center gap-1 px-1.5 text-[9px] font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer ${subTask.completed ? 'opacity-50' : ''}`}
             style={{
               width: subTaskSize.w,
               height: subTaskSize.h,
@@ -201,12 +204,20 @@ export const CanvasTaskNode = ({
               top: y - subTaskSize.h / 2 + size.h / 2,
               borderColor: projectColor,
               borderWidth: 2,
+              borderStyle: subTask.completed ? 'dashed' : 'solid',
             }}
             title={subTask.titre}
             onClick={() => onTaskClick(subTask)}
           >
+            <Checkbox
+              checked={subTask.completed}
+              className="h-3 w-3 shrink-0"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onCheckedChange={() => onToggleComplete(subTask)}
+            />
             {subTask.taille && (
-              <span className={`${getTailleBadgeColor(subTask.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium`}>
+              <span className={`${getTailleBadgeColor(subTask.taille)} text-[7px] px-1 py-0.5 rounded-full font-medium`}>
                 {subTask.taille}
               </span>
             )}
@@ -221,21 +232,30 @@ export const CanvasTaskNode = ({
           relative rounded-2xl bg-card border-2 shadow-lg flex items-center gap-1.5 px-2
           cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow
           ${isDragging ? 'ring-2 ring-primary ring-offset-2' : ''}
+          ${task.completed ? 'opacity-60' : ''}
         `}
         style={{
           width: size.w,
           height: size.h,
           borderColor: projectColor,
+          borderStyle: task.completed ? 'dashed' : 'solid',
           backgroundColor: `color-mix(in srgb, ${projectColor} 10%, hsl(var(--card)))`,
         }}
       >
+        <Checkbox
+          checked={task.completed}
+          className="h-3.5 w-3.5 shrink-0"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onCheckedChange={() => onToggleComplete(task)}
+        />
         {task.taille && (
           <span className={`${getTailleBadgeColor(task.taille)} text-[8px] px-1.5 py-0.5 rounded-full font-medium shrink-0`}>
             {task.taille}
           </span>
         )}
         <span 
-          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center flex-1 line-clamp-2`}
+          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center flex-1 line-clamp-2 ${task.completed ? 'line-through' : ''}`}
           title={task.titre}
         >
           {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}

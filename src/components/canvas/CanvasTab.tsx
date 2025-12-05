@@ -59,6 +59,16 @@ export const CanvasTab = () => {
     setSelectedTask(null);
   };
 
+  const handleToggleComplete = async (task: Task) => {
+    await supabase
+      .from('tasks')
+      .update({ 
+        completed: !task.completed,
+        completed_at: !task.completed ? new Date().toISOString() : null
+      })
+      .eq('id', task.id);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[600px]">
@@ -86,6 +96,7 @@ export const CanvasTab = () => {
         showSubTasks={showSubTasks}
         onToggleSubTasks={setShowSubTasks}
         onTaskClick={handleTaskClick}
+        onToggleComplete={handleToggleComplete}
       />
       <TaskDialog
         open={dialogOpen}
