@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Task } from "@/components/tasks/TasksTab";
 import { TaskCanvas } from "./TaskCanvas";
+import TaskDialog from "@/components/tasks/TaskDialog";
 
 export const CanvasTab = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSubTasks, setShowSubTasks] = useState(true);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -45,6 +48,17 @@ export const CanvasTab = () => {
       .eq('id', taskId);
   };
 
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    await supabase.from('tasks').delete().eq('id', taskId);
+    setDialogOpen(false);
+    setSelectedTask(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[600px]">
@@ -64,12 +78,21 @@ export const CanvasTab = () => {
   });
 
   return (
-    <TaskCanvas 
-      tasks={rootTasks} 
-      subTasksMap={subTasksMap}
-      onUpdateTask={handleUpdateTask}
-      showSubTasks={showSubTasks}
-      onToggleSubTasks={setShowSubTasks}
-    />
+    <>
+      <TaskCanvas 
+        tasks={rootTasks} 
+        subTasksMap={subTasksMap}
+        onUpdateTask={handleUpdateTask}
+        showSubTasks={showSubTasks}
+        onToggleSubTasks={setShowSubTasks}
+        onTaskClick={handleTaskClick}
+      />
+      <TaskDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        task={selectedTask}
+        onDelete={handleDeleteTask}
+      />
+    </>
   );
 };
