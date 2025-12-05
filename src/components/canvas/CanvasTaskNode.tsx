@@ -10,6 +10,7 @@ interface CanvasTaskNodeProps {
   onDragStart: () => void;
   onDragEnd: (x: number, y: number) => void;
   showSubTasks: boolean;
+  onTaskClick: (task: Task) => void;
 }
 
 export const CanvasTaskNode = ({
@@ -20,6 +21,7 @@ export const CanvasTaskNode = ({
   onDragStart,
   onDragEnd,
   showSubTasks,
+  onTaskClick,
 }: CanvasTaskNodeProps) => {
   const [project, setProject] = useState<{ couleur: string } | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
@@ -72,28 +74,45 @@ export const CanvasTaskNode = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    onDragStart();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let hasDragged = false;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!canvasRef.current) return;
-      const rect = canvasRef.current.getBoundingClientRect();
-      setDragPos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
+      const distance = Math.sqrt(
+        Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2)
+      );
+
+      if (distance > 5 && !hasDragged) {
+        hasDragged = true;
+        onDragStart();
+      }
+
+      if (hasDragged && canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        setDragPos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        });
+      }
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (!canvasRef.current) return;
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      // Keep position as pending until DB updates
-      setPendingPos({ x, y });
-      setDragPos(null);
-      onDragEnd(x, y);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+
+      if (!hasDragged) {
+        // C'était un clic, pas un drag
+        onTaskClick(task);
+      } else if (canvasRef.current) {
+        // C'était un drag
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setPendingPos({ x, y });
+        setDragPos(null);
+        onDragEnd(x, y);
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -166,7 +185,7 @@ export const CanvasTaskNode = ({
         return (
           <div
             key={subTask.id}
-            className="absolute rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center text-[10px] font-medium text-muted-foreground hover:scale-110 transition-transform cursor-default"
+            className="absolute rounded-full bg-card border border-border/50 shadow-sm flex items-center justify-center text-[10px] font-medium text-muted-foreground hover:scale-110 transition-transform cursor-pointer"
             style={{
               width: subTaskSize,
               height: subTaskSize,
@@ -176,6 +195,7 @@ export const CanvasTaskNode = ({
               borderWidth: 2,
             }}
             title={subTask.titre}
+            onClick={() => onTaskClick(subTask)}
           >
             {subTask.taille || ''}
           </div>
