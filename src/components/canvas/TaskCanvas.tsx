@@ -11,9 +11,10 @@ interface TaskCanvasProps {
   showSubTasks: boolean;
   onToggleSubTasks: (value: boolean) => void;
   onTaskClick: (task: Task) => void;
+  onToggleComplete: (task: Task) => void;
 }
 
-export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask, showSubTasks, onToggleSubTasks, onTaskClick }: TaskCanvasProps) => {
+export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask, showSubTasks, onToggleSubTasks, onTaskClick, onToggleComplete }: TaskCanvasProps) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -103,6 +104,7 @@ export const TaskCanvas = ({ tasks, subTasksMap, onUpdateTask, showSubTasks, onT
               onDragEnd={(x, y) => handleDragEnd(task.id, x, y)}
               showSubTasks={showSubTasks}
               onTaskClick={onTaskClick}
+              onToggleComplete={onToggleComplete}
             />
           ))}
         </div>
