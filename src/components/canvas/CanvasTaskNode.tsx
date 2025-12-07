@@ -229,7 +229,7 @@ export const CanvasTaskNode = ({
       <div
         onMouseDown={handleMouseDown}
         className={`
-          relative rounded-2xl bg-card border-2 shadow-lg flex items-start gap-1.5 px-2 py-1.5
+          relative rounded-2xl bg-card border-2 shadow-lg flex items-center gap-1.5 px-2
           cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow
           ${isDragging ? 'ring-2 ring-primary ring-offset-2' : ''}
           ${task.completed ? 'opacity-60' : ''}
