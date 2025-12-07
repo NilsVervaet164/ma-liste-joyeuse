@@ -71,10 +71,10 @@ export const CanvasTaskNode = ({
 
   const getFontConfig = (size: { w: number; h: number }) => {
     switch (size.w) {
-      case 120: return { fontSize: 'text-xs', maxChars: 20, lineHeight: 'leading-tight' };
-      case 140: return { fontSize: 'text-sm', maxChars: 24, lineHeight: 'leading-tight' };
-      case 160: return { fontSize: 'text-sm', maxChars: 28, lineHeight: 'leading-snug' };
-      default: return { fontSize: 'text-base', maxChars: 32, lineHeight: 'leading-snug' };
+      case 120: return { fontSize: 'text-[10px]', maxChars: 18, lineHeight: 'leading-tight' };
+      case 140: return { fontSize: 'text-xs', maxChars: 22, lineHeight: 'leading-tight' };
+      case 160: return { fontSize: 'text-xs', maxChars: 26, lineHeight: 'leading-snug' };
+      default: return { fontSize: 'text-sm', maxChars: 30, lineHeight: 'leading-snug' };
     }
   };
 
@@ -229,7 +229,7 @@ export const CanvasTaskNode = ({
       <div
         onMouseDown={handleMouseDown}
         className={`
-          relative rounded-2xl bg-card border-2 shadow-lg flex items-center gap-1.5 px-2
+          relative rounded-2xl bg-card border-2 shadow-lg flex items-start gap-1.5 px-2 py-1.5
           cursor-grab active:cursor-grabbing hover:shadow-xl transition-shadow
           ${isDragging ? 'ring-2 ring-primary ring-offset-2' : ''}
           ${task.completed ? 'opacity-60' : ''}
@@ -257,7 +257,7 @@ export const CanvasTaskNode = ({
           )}
         </div>
         <span 
-          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center flex-1 line-clamp-2 ${task.completed ? 'line-through' : ''}`}
+          className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-left flex-1 line-clamp-2 ${task.completed ? 'line-through' : ''}`}
           title={task.titre}
         >
           {task.titre.length > fontConfig.maxChars ? task.titre.substring(0, fontConfig.maxChars - 2) + '...' : task.titre}
