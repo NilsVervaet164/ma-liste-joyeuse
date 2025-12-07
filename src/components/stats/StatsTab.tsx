@@ -1,69 +1,43 @@
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, ListTodo, TrendingUp, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchStats = async () => {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
+
+  const [activeRes, todayRes, monthRes, yearRes] = await Promise.all([
+    supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('completed', false),
+    supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('completed', true).gte('completed_at', startOfDay),
+    supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('completed', true).gte('completed_at', startOfMonth),
+    supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('completed', true).gte('completed_at', startOfYear),
+  ]);
+
+  return {
+    active: activeRes.count || 0,
+    today: todayRes.count || 0,
+    thisMonth: monthRes.count || 0,
+    thisYear: yearRes.count || 0,
+  };
+};
 
 const StatsTab = () => {
-  const [stats, setStats] = useState({
-    active: 0,
-    today: 0,
-    thisMonth: 0,
-    thisYear: 0,
+  const { data: stats = { active: 0, today: 0, thisMonth: 0, thisYear: 0 } } = useQuery({
+    queryKey: ['stats'],
+    queryFn: fetchStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
-  const [chartData, setChartData] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    const now = new Date();
-    const startOfDay = new Date(now.setHours(0, 0, 0, 0)).toISOString();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
-
-    // Active tasks
-    const { count: active } = await supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .eq('completed', false);
-
-    // Completed today
-    const { count: today } = await supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .eq('completed', true)
-      .gte('completed_at', startOfDay);
-
-    // Completed this month
-    const { count: thisMonth } = await supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .eq('completed', true)
-      .gte('completed_at', startOfMonth);
-
-    // Completed this year
-    const { count: thisYear } = await supabase
-      .from('tasks')
-      .select('*', { count: 'exact', head: true })
-      .eq('completed', true)
-      .gte('completed_at', startOfYear);
-
-    setStats({
-      active: active || 0,
-      today: today || 0,
-      thisMonth: thisMonth || 0,
-      thisYear: thisYear || 0,
-    });
-
-    // Prepare chart data
-    setChartData([
-      { name: "Aujourd'hui", value: today || 0 },
-      { name: "Ce mois", value: thisMonth || 0 },
-      { name: "Cette année", value: thisYear || 0 },
-    ]);
-  };
+  const chartData = [
+    { name: "Aujourd'hui", value: stats.today },
+    { name: "Ce mois", value: stats.thisMonth },
+    { name: "Cette année", value: stats.thisYear },
+  ];
 
   return (
     <div className="space-y-6">
