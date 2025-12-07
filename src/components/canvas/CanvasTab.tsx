@@ -7,9 +7,10 @@ import TaskDialog from "@/components/tasks/TaskDialog";
 export const CanvasTab = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showSubTasks, setShowSubTasks] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [fadingOutTasks, setFadingOutTasks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchTasks();
@@ -29,10 +30,10 @@ export const CanvasTab = () => {
   }, []);
 
   const fetchTasks = async () => {
+    // Fetch ALL tasks (including completed subtasks)
     const { data, error } = await supabase
       .from('tasks')
       .select('*')
-      .eq('completed', false)
       .order('ordre', { ascending: true });
 
     if (!error && data) {
@@ -53,6 +54,18 @@ export const CanvasTab = () => {
     setDialogOpen(true);
   };
 
+  const handleToggleExpand = (taskId: string) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
   const handleDeleteTask = async (taskId: string) => {
     await supabase.from('tasks').delete().eq('id', taskId);
     setDialogOpen(false);
@@ -60,11 +73,27 @@ export const CanvasTab = () => {
   };
 
   const handleToggleComplete = async (task: Task) => {
+    const isCompleting = !task.completed;
+    
+    // If completing a root task, trigger fade-out animation first
+    if (isCompleting && task.parent_id === null) {
+      setFadingOutTasks(prev => new Set(prev).add(task.id));
+      
+      // Wait for animation to complete
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      setFadingOutTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(task.id);
+        return newSet;
+      });
+    }
+    
     await supabase
       .from('tasks')
       .update({ 
-        completed: !task.completed,
-        completed_at: !task.completed ? new Date().toISOString() : null
+        completed: isCompleting,
+        completed_at: isCompleting ? new Date().toISOString() : null
       })
       .eq('id', task.id);
   };
@@ -77,9 +106,13 @@ export const CanvasTab = () => {
     );
   }
 
-  const rootTasks = tasks.filter(t => t.parent_id === null);
-  const subTasksMap = new Map<string, Task[]>();
+  // Filter: show only non-completed root tasks (+ those fading out)
+  const rootTasks = tasks.filter(t => 
+    t.parent_id === null && (!t.completed || fadingOutTasks.has(t.id))
+  );
   
+  // Subtasks map: include ALL subtasks (completed ones will be grayed out)
+  const subTasksMap = new Map<string, Task[]>();
   tasks.forEach(t => {
     if (t.parent_id) {
       const existing = subTasksMap.get(t.parent_id) || [];
@@ -93,10 +126,11 @@ export const CanvasTab = () => {
         tasks={rootTasks} 
         subTasksMap={subTasksMap}
         onUpdateTask={handleUpdateTask}
-        showSubTasks={showSubTasks}
-        onToggleSubTasks={setShowSubTasks}
+        expandedTasks={expandedTasks}
+        onToggleExpand={handleToggleExpand}
         onTaskClick={handleTaskClick}
         onToggleComplete={handleToggleComplete}
+        fadingOutTasks={fadingOutTasks}
       />
       <TaskDialog
         open={dialogOpen}

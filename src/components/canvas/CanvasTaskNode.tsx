@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, RefObject } from "react";
 import { Task } from "@/components/tasks/TasksTab";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface CanvasTaskNodeProps {
   task: Task;
@@ -10,9 +11,11 @@ interface CanvasTaskNodeProps {
   isDragging: boolean;
   onDragStart: () => void;
   onDragEnd: (x: number, y: number) => void;
-  showSubTasks: boolean;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
   onTaskClick: (task: Task) => void;
   onToggleComplete: (task: Task) => void;
+  isFadingOut: boolean;
 }
 
 export const CanvasTaskNode = ({
@@ -22,9 +25,11 @@ export const CanvasTaskNode = ({
   isDragging,
   onDragStart,
   onDragEnd,
-  showSubTasks,
+  isExpanded,
+  onToggleExpand,
   onTaskClick,
   onToggleComplete,
+  isFadingOut,
 }: CanvasTaskNodeProps) => {
   const [project, setProject] = useState<{ couleur: string } | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
@@ -113,10 +118,14 @@ export const CanvasTaskNode = ({
       document.removeEventListener('mouseup', handleMouseUp);
 
       if (!hasDragged) {
-        // C'était un clic, pas un drag
-        onTaskClick(task);
+        // Click: toggle expand if has subtasks, otherwise open dialog
+        if (subTasks.length > 0) {
+          onToggleExpand();
+        } else {
+          onTaskClick(task);
+        }
       } else if (canvasRef.current) {
-        // C'était un drag
+        // Drag
         const rect = canvasRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -144,7 +153,7 @@ export const CanvasTaskNode = ({
 
   return (
     <div
-      className={`absolute ${isAnimating ? 'transition-all duration-200' : ''}`}
+      className={`absolute ${isAnimating ? 'transition-all duration-200' : ''} ${isFadingOut ? 'animate-fade-out pointer-events-none' : ''}`}
       style={{
         left: typeof baseX === 'string' ? baseX : `${baseX}px`,
         top: typeof baseY === 'string' ? baseY : `${baseY}px`,
@@ -153,7 +162,7 @@ export const CanvasTaskNode = ({
       }}
     >
       {/* Connection lines to subtasks */}
-      {showSubTasks && subTasks.length > 0 && (
+      {isExpanded && subTasks.length > 0 && (
         <svg
           className="absolute pointer-events-none"
           style={{
@@ -188,7 +197,7 @@ export const CanvasTaskNode = ({
       )}
 
       {/* Subtask nodes */}
-      {showSubTasks && subTasks.map((subTask, index) => {
+      {isExpanded && subTasks.map((subTask, index) => {
         const angle = (index / subTasks.length) * 2 * Math.PI - Math.PI / 2;
         const x = Math.cos(angle) * subTaskRadius;
         const y = Math.sin(angle) * subTaskRadius;
@@ -196,7 +205,7 @@ export const CanvasTaskNode = ({
         return (
           <div
             key={subTask.id}
-            className={`absolute rounded-xl bg-card shadow-sm flex items-center gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:scale-105 transition-transform cursor-pointer ${subTask.completed ? 'opacity-50' : ''}`}
+            className={`absolute rounded-xl bg-card shadow-sm flex items-center gap-1.5 px-2 text-xs font-medium hover:scale-105 transition-transform cursor-pointer ${subTask.completed ? 'opacity-50 text-muted-foreground/60' : 'text-muted-foreground'}`}
             style={{
               width: subTaskSize.w,
               height: subTaskSize.h,
@@ -216,11 +225,13 @@ export const CanvasTaskNode = ({
               onMouseDown={(e) => e.stopPropagation()}
               onCheckedChange={() => onToggleComplete(subTask)}
             />
-            {subTask.taille && (
-              <span className={`${getTailleBadgeColor(subTask.taille)} text-[9px] px-1.5 py-0.5 rounded-full font-medium`}>
-                {subTask.taille}
-              </span>
-            )}
+            <span className={subTask.completed ? 'line-through' : ''}>
+              {subTask.taille && (
+                <span className={`${getTailleBadgeColor(subTask.taille)} text-[9px] px-1.5 py-0.5 rounded-full font-medium`}>
+                  {subTask.taille}
+                </span>
+              )}
+            </span>
           </div>
         );
       })}
@@ -264,11 +275,16 @@ export const CanvasTaskNode = ({
         </span>
       </div>
 
-      {/* Subtask count badge */}
+      {/* Subtask count badge with expand indicator */}
       {subTasks.length > 0 && (
         <div 
-          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center"
+          className="absolute -bottom-1 -right-1 w-6 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center gap-0.5"
         >
+          {isExpanded ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronRight className="h-3 w-3" />
+          )}
           {subTasks.length}
         </div>
       )}
