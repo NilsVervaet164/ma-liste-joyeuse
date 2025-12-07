@@ -212,7 +212,7 @@ const TaskRow = ({ task, level, onEdit, onDelete, onToggleComplete }: TaskRowPro
 
       {/* SubTasks */}
       {expanded && hasSubTasks && (
-        <div className="animate-accordion-down">
+        <div>
           {subTasks.map((subTask) => (
             <TaskRow
               key={subTask.id}

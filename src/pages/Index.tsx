@@ -50,19 +50,19 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="tasks">
+          <TabsContent value="tasks" forceMount className="data-[state=inactive]:hidden">
             <TasksTab />
           </TabsContent>
 
-          <TabsContent value="canvas">
+          <TabsContent value="canvas" forceMount className="data-[state=inactive]:hidden">
             <CanvasTab />
           </TabsContent>
 
-          <TabsContent value="stats">
+          <TabsContent value="stats" forceMount className="data-[state=inactive]:hidden">
             <StatsTab />
           </TabsContent>
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" forceMount className="data-[state=inactive]:hidden">
             <SettingsTab />
           </TabsContent>
         </Tabs>
