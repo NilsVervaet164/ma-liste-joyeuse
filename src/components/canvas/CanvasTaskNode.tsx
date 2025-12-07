@@ -71,10 +71,10 @@ export const CanvasTaskNode = ({
 
   const getFontConfig = (size: { w: number; h: number }) => {
     switch (size.w) {
-      case 120: return { fontSize: 'text-[10px]', maxChars: 18, lineHeight: 'leading-tight' };
-      case 140: return { fontSize: 'text-xs', maxChars: 22, lineHeight: 'leading-tight' };
-      case 160: return { fontSize: 'text-xs', maxChars: 26, lineHeight: 'leading-snug' };
-      default: return { fontSize: 'text-sm', maxChars: 30, lineHeight: 'leading-snug' };
+      case 120: return { fontSize: 'text-[10px]', maxChars: 28, lineHeight: 'leading-tight' };
+      case 140: return { fontSize: 'text-xs', maxChars: 34, lineHeight: 'leading-tight' };
+      case 160: return { fontSize: 'text-xs', maxChars: 40, lineHeight: 'leading-snug' };
+      default: return { fontSize: 'text-sm', maxChars: 46, lineHeight: 'leading-snug' };
     }
   };
 
