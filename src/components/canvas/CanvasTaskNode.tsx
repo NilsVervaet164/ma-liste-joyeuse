@@ -242,18 +242,20 @@ export const CanvasTaskNode = ({
           backgroundColor: `color-mix(in srgb, ${projectColor} 10%, hsl(var(--card)))`,
         }}
       >
-        <Checkbox
-          checked={task.completed}
-          className="h-4 w-4 shrink-0"
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onCheckedChange={() => onToggleComplete(task)}
-        />
-        {task.taille && (
-          <span className={`${getTailleBadgeColor(task.taille)} text-xs px-2 py-0.5 rounded-full font-medium shrink-0`}>
-            {task.taille}
-          </span>
-        )}
+        <div className="flex flex-col items-center gap-0.5 shrink-0">
+          <Checkbox
+            checked={task.completed}
+            className="h-4 w-4"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onCheckedChange={() => onToggleComplete(task)}
+          />
+          {task.taille && (
+            <span className={`${getTailleBadgeColor(task.taille)} text-[9px] px-1.5 py-0 rounded-full font-medium`}>
+              {task.taille}
+            </span>
+          )}
+        </div>
         <span 
           className={`${fontConfig.fontSize} ${fontConfig.lineHeight} font-medium text-center flex-1 line-clamp-2 ${task.completed ? 'line-through' : ''}`}
           title={task.titre}
